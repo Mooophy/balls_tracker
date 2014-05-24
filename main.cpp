@@ -25,9 +25,9 @@ int main( )
     while(true)
     {
         //! raw image
-        cv::Mat raw, hsv, blue,red,green, output;
+        cv::Mat raw,gray, hsv, blue,red,green, output;
         cap >> raw;
-
+/*
 
         cv::cvtColor(raw,hsv,cv::COLOR_BGR2HSV);
         cv::imshow("hsv",hsv);
@@ -37,9 +37,17 @@ int main( )
 
         //! red range [150,100,100],[179,255,255];
         cv::inRange(hsv,cv::Scalar(150,100,100),cv::Scalar(179,255,255), red);
-        cv::imshow("red", red);
 
-        cv::HoughCircles(red,circles,CV_HOUGH_GRADIENT, 2, 100,50,5,10);
+
+
+        cv::imshow("red", red);
+*/
+        cv::cvtColor(raw,gray, cv::COLOR_BGR2GRAY);
+
+        cv::GaussianBlur( gray, gray, cv::Size(9, 9), 2, 2 );
+
+
+        cv::HoughCircles(gray,circles,CV_HOUGH_GRADIENT, 3, 10000,100,20,40);
 
         if(!circles.empty() && circles[0][2] > 10 && circles[0][2] < 80)
         {
@@ -50,7 +58,7 @@ int main( )
         //cv::circle(raw,cv::Point(0,0),50,cv::Scalar(0));
 
 
-        cv::imshow("raw", raw);
+        cv::imshow("raw",raw );
 
         if(cv::waitKey(30) >= 0) break;
     }
