@@ -56,8 +56,6 @@ int main( )
         }
 
         //cv::circle(raw,cv::Point(0,0),50,cv::Scalar(0));
-
-
         cv::imshow("raw",raw );
 
         if(cv::waitKey(30) >= 0) break;
