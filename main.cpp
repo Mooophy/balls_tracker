@@ -54,7 +54,7 @@ int main( )
          * @brief thresholding for green, blue and red respectively.
          */
         cv::Mat green, blue, red;
-        cv::inRange(hsv, cv::Scalar(30 ,100,100), cv::Scalar(60 ,255,255), green);
+        cv::inRange(hsv, cv::Scalar(30 ,100,100), cv::Scalar(70 ,255,255), green);
         cv::inRange(hsv, cv::Scalar(100,100,100), cv::Scalar(120,255,255), blue );
         cv::inRange(hsv, cv::Scalar(150,100,100), cv::Scalar(179,255,255), red  );
 
@@ -68,9 +68,9 @@ int main( )
         /**
          * @brief seach and store results to containers.
          */
-        cv::HoughCircles(green, green_balls, CV_HOUGH_GRADIENT, 1, 100, 50, 12 ,40);
-        cv::HoughCircles(blue , blue_balls , CV_HOUGH_GRADIENT, 1, 100, 50, 12 ,40);
-        cv::HoughCircles(red  , red_balls  , CV_HOUGH_GRADIENT, 1, 100, 50, 12 ,40);
+        cv::HoughCircles(green, green_balls, CV_HOUGH_GRADIENT, 1, 80, 20, 12 ,40);
+        cv::HoughCircles(blue , blue_balls , CV_HOUGH_GRADIENT, 1, 195, 105, 20,40);
+        cv::HoughCircles(red  , red_balls  , CV_HOUGH_GRADIENT, 2, 800, 565, 12 ,40);
 
         /**
          * @brief print how many balls detected for each color.
@@ -86,6 +86,7 @@ int main( )
         draw(raw, blue_balls );
         draw(raw, red_balls  );
         cv::imshow("final", raw);
+
 
         if(cv::waitKey(30) >= 0)
             break;
@@ -103,7 +104,7 @@ int main( )
 void draw(cv::Mat& mat, const std::vector<cv::Vec3f>& container)
 {
     if(!container.empty())
-        for(unsigned i = 0; i != container.size(); ++i)
-            if(container[i][2] > 10 && container[i][2] < 60)
+        for(unsigned i = 0; i != container.size() && i != 4; ++i)
+            if(container[i][2] > 5 && container[i][2] < 80)
                 cv::circle(mat, cv::Point(container[i][0], container[i][1]), 45, cv::Scalar(0), 3);
 }
