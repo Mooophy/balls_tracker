@@ -3,16 +3,27 @@
 #include <cv.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
-
 #include <iostream>
 #include <vector>
 #include <cstring>
 #include <highgui.h>
 #include <math.h>
 
+
+/**
+ * @brief draw
+ *
+ * draw circles on the mamt using information from the container.
+ */
+void draw(cv::Mat& mat, const std::vector<cv::Vec3f>& container);
+
 int main( )
 {
-     //! test for usb camara
+    using Container = std::vector<cv::Vec3f>;
+
+    /**
+     * @brief open default camara
+     */
     cv::VideoCapture cap(0);
     if(!cap.isOpened())
     {
@@ -20,51 +31,79 @@ int main( )
         return -1;
     }
 
-    std::vector<cv::Vec3f> circles;
+    /**
+     * @brief build containers for the three colors
+     */
+    Container red_balls, green_balls, blue_balls;
 
     while(true)
     {
-        //! raw image
-        cv::Mat raw,gray, hsv, blue,red,green, output;
+        /**
+         * @brief fetch the current frame from stream.
+         */
+        cv::Mat raw;
         cap >> raw;
 
-        cv::cvtColor(raw,hsv,cv::COLOR_BGR2HSV);
-        cv::imshow("hsv",hsv);
+        /**
+         * @brief convert raw to hsv.
+         */
+        cv::Mat hsv;
+        cv::cvtColor(raw, hsv, cv::COLOR_BGR2HSV);
 
-//        cv::inRange(hsv,cv::Scalar(100,100,100),cv::Scalar(120,255,255), blue);
-//        cv::imshow("blue",blue);
+        /**
+         * @brief thresholding for green, blue and red respectively.
+         */
+        cv::Mat green, blue, red;
+        cv::inRange(hsv, cv::Scalar(30 ,100,100), cv::Scalar(60 ,255,255), green);
+        cv::inRange(hsv, cv::Scalar(100,100,100), cv::Scalar(120,255,255), blue );
+        cv::inRange(hsv, cv::Scalar(150,100,100), cv::Scalar(179,255,255), red  );
 
-//        //! red range [150,100,100],[179,255,255];
-//        cv::inRange(hsv,cv::Scalar(150,100,100),cv::Scalar(179,255,255), red);
+        /**
+         * @brief blur each mat.
+         */
+        cv::GaussianBlur(green,green, cv::Size(9,9), 2, 2);
+        cv::GaussianBlur(blue ,blue , cv::Size(9,9), 2, 2);
+        cv::GaussianBlur(red  ,red  , cv::Size(9,9), 2, 2);
 
-        //cv::imshow("red", red);
-        //! green range [30,100,100],[60,255,255];
-        cv::inRange(hsv,cv::Scalar(30,100,100),cv::Scalar(60,255,255), green);
-//        cv::cvtColor(raw,gray, cv::COLOR_BGR2GRAY);
-//        cv::imshow("gray", gray);
+        /**
+         * @brief seach and store results to containers.
+         */
+        cv::HoughCircles(green, green_balls, CV_HOUGH_GRADIENT, 1, 100, 50, 12 ,40);
+        cv::HoughCircles(blue , blue_balls , CV_HOUGH_GRADIENT, 1, 100, 50, 12 ,40);
+        cv::HoughCircles(red  , red_balls  , CV_HOUGH_GRADIENT, 1, 100, 50, 12 ,40);
 
-        cv::GaussianBlur( green, green, cv::Size(9, 9), 2, 2 );
+        /**
+         * @brief print how many balls detected for each color.
+         */
+        std::cout << "green:  " << green_balls.size() << std::endl;
+        std::cout << "blue :  " << blue_balls.size()  << std::endl;
+        std::cout << "red  :  " << red_balls.size()   << std::endl;
 
+        /**
+         * @brief draw on the original mat
+         */
+        draw(raw, green_balls);
+        draw(raw, blue_balls );
+        draw(raw, red_balls  );
+        cv::imshow("final", raw);
 
-        cv::HoughCircles(green,circles,CV_HOUGH_GRADIENT, 1, 100,50,12,40);
-
-        std::cout << "size = " << circles.size() << std::endl;
-        if(!circles.empty() && circles[0][2] > 10 && circles[0][2] < 80)
-        {
-            std::cout << *circles.begin() << std::endl;
-
-            //cv::circle(raw,cv::Point(circles[0][0],circles[0][1]), 45, cv::Scalar(0),3);
-            for(unsigned i = 0; i != circles.size(); ++i)
-                cv::circle(raw,cv::Point(circles[i][0],circles[i][1]), 45, cv::Scalar(0),3);
-        }
-
-        //cv::circle(raw,cv::Point(0,0),50,cv::Scalar(0));
-
-
-        cv::imshow("raw",raw );
-
-        if(cv::waitKey(30) >= 0) break;
+        if(cv::waitKey(30) >= 0)
+            break;
     }
-
   return 0;
+}
+
+/**
+ * @brief draw
+ * @param mat
+ * @param container
+ *
+ * draw circles on the mat using information from the container.
+ */
+void draw(cv::Mat& mat, const std::vector<cv::Vec3f>& container)
+{
+    if(!container.empty())
+        for(unsigned i = 0; i != container.size(); ++i)
+            if(container[i][2] > 10 && container[i][2] < 60)
+                cv::circle(mat, cv::Point(container[i][0], container[i][1]), 45, cv::Scalar(0), 3);
 }
