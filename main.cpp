@@ -1,12 +1,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <cv.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>
 #include <cstring>
-#include <highgui.h>
 #include <math.h>
 
 
@@ -54,7 +52,7 @@ int main( )
          * @brief thresholding for green, blue and red respectively.
          */
         cv::Mat green, blue, red;
-        cv::inRange(hsv, cv::Scalar(30 ,100,100), cv::Scalar(70 ,255,255), green);
+        cv::inRange(hsv, cv::Scalar(40 ,70,130), cv::Scalar(70 ,255,255), green);
         cv::inRange(hsv, cv::Scalar(100,100,100), cv::Scalar(120,255,255), blue );
         cv::inRange(hsv, cv::Scalar(150,100,100), cv::Scalar(179,255,255), red  );
 
@@ -68,9 +66,16 @@ int main( )
         /**
          * @brief seach and store results to containers.
          */
-        cv::HoughCircles(green, green_balls, CV_HOUGH_GRADIENT, 1, 80, 20, 12 ,40);
-        cv::HoughCircles(blue , blue_balls , CV_HOUGH_GRADIENT, 1, 195, 105, 20,40);
-        cv::HoughCircles(red  , red_balls  , CV_HOUGH_GRADIENT, 2, 800, 565, 12 ,40);
+        cv::HoughCircles(green, green_balls, CV_HOUGH_GRADIENT, 1, 195, 100, 12 ,40);
+        cv::HoughCircles(blue , blue_balls , CV_HOUGH_GRADIENT, 1, 195, 205, 12 ,40);
+        cv::HoughCircles(red  , red_balls  , CV_HOUGH_GRADIENT, 2, 800, 560, 12 ,40);
+
+        /**
+         * @brief gray images for debugging
+         */
+//        imshow("green", green);
+//        imshow("blue ", blue );
+//        imshow("red  ", red  );
 
         /**
          * @brief print how many balls detected for each color.
@@ -87,7 +92,9 @@ int main( )
         draw(raw, red_balls  );
         cv::imshow("final", raw);
 
-
+        /**
+         * @brief terminate the program when any key pressed
+         */
         if(cv::waitKey(30) >= 0)
             break;
     }
