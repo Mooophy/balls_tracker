@@ -52,7 +52,7 @@ int main( )
          * @brief thresholding for green, blue and red respectively.
          */
         cv::Mat green, blue, red;
-        cv::inRange(hsv, cv::Scalar(40 ,70,130), cv::Scalar(70 ,255,255), green);
+        cv::inRange(hsv, cv::Scalar(40 ,70,130 ), cv::Scalar(70 ,255,255), green);
         cv::inRange(hsv, cv::Scalar(100,100,100), cv::Scalar(120,255,255), blue );
         cv::inRange(hsv, cv::Scalar(150,100,100), cv::Scalar(179,255,255), red  );
 
