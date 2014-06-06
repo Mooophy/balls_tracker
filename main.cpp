@@ -17,8 +17,8 @@ void draw(cv::Mat& mat, const std::vector<cv::Vec3f>& container);
 
 int main( )
 {
-    using Container = std::vector<cv::Vec3f>;
-
+    //using Container = std::vector<cv::Vec3f>;
+    typedef std::vector<cv::Vec3f>  Container;
     /**
      * @brief open default camara
      */
